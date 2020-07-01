@@ -1,0 +1,146 @@
+################################################################################
+# coati models vs prank vs mafft alignments                                    #
+################################################################################
+
+.PHONY: align_coati align_mcoati align_dna align_ecm align_mecm align_mafft
+.PHONY: align_prank align_clustalo
+
+SPECIES = gorilla
+RPATH = raw_data/$(SPECIES)
+
+SEQS_COATI = $(addprefix aln/coati/,$(shell ls $(RPATH)/))
+SEQS_MCOATI = $(addprefix aln/mcoati/,$(shell ls $(RPATH)/))
+SEQS_DPMCOATI = $(addprefix aln/dpmcoati/,$(shell ls $(RPATH)/))
+SEQS_DNA = $(addprefix aln/dna/,$(shell ls $(RPATH)/))
+SEQS_ECM = $(addprefix aln/ecm/,$(shell ls $(RPATH)/))
+SEQS_MECM = $(addprefix aln/mecm/,$(shell ls $(RPATH)/))
+SEQS_PRANK = $(addprefix aln/prank/,$(shell ls $(RPATH)/))
+SEQS_MAFFT = $(addprefix aln/mafft/,$(shell ls $(RPATH)/))
+SEQS_CLUSTALO = $(addprefix aln/clustalo/,$(shell ls $(RPATH)/))
+
+a:
+	echo $(SEQS)
+
+align_coati: $(SEQS_COATI)
+align_mcoati: $(SEQS_MCOATI)
+align_dpmcoati: $(SEQS_DPMCOATI)
+align_dna: $(SEQS_DNA)
+align_ecm: $(SEQS_ECM)
+align_mecm: $(SEQS_MECM)
+align_prank: $(SEQS_PRANK)
+align_mafft: $(SEQS_MAFFT)
+align_clustalo: $(SEQS_CLUSTALO)
+
+
+aln/coati/%:
+	./coati-alignpair -f $(RPATH)/$* -m coati -o $@
+
+aln/mcoati/%:
+	./coati-alignpair -f $(RPATH)/$* -m m-coati -o $@
+
+aln/dpmcoati/%:
+	./coati-alignpair -f $(RPATH)/$* -m dp-mcoati -o $@
+
+aln/dna/%:
+	./coati-alignpair -f $(RPATH)/$* -m dna -o $@
+
+aln/ecm/%:
+	./coati-alignpair -f $(RPATH)/$* -m ecm -o $@
+
+aln/mecm/%:
+	./coati-alignpair -f $(RPATH)/$* -m m-ecm -o $@
+
+aln/prank/%:
+	prank -codon -d="$(RPATH)/"$* -o=$@ -quiet
+	mv $@.best.fas $@
+
+aln/mafft/%:
+	mafft --quiet --preservecase --globalpair --maxiterate 1000 $(RPATH)/$* > $@
+
+aln/clustalo/%:
+	clustalo -i $(RPATH)/$* -o $@
+
+clean_initial_%:
+	rm aln/$*/*
+
+clean_initial_all:
+	rm aln/coati/*
+	rm aln/mcoati/*
+	rm aln/dna/*
+	rm aln/ecm/*
+	rm aln/mecm/*
+	rm aln/prank/*
+	rm aln/mafft/*
+	rm aln/clustalo/*
+
+################################################################################
+# coati models vs prank vs mafft vs clustalO using REFERENCE aligments         #
+################################################################################
+
+.PHONY: reference_coati reference_mcoati reference_dna reference_ecm reference_mecm
+.PHONY: reference_mafft reference_prank reference_clustalo 
+
+NREF = data/$(SPECIES)/no_gaps_ref
+#NREF = data/$(SPECIES)/test
+REF_COATI = $(addprefix aln/ref/coati/,$(shell ls $(NREF)/))
+REF_MCOATI = $(addprefix aln/ref/mcoati/,$(shell ls $(NREF)/))
+REF_DPMCOATI = $(addprefix aln/ref/dpmcoati/,$(shell ls $(NREF)/))
+REF_DNA = $(addprefix aln/ref/dna/,$(shell ls $(NREF)/))
+REF_ECM = $(addprefix aln/ref/ecm/,$(shell ls $(NREF)/))
+REF_MECM = $(addprefix aln/ref/mecm/,$(shell ls $(NREF)/))
+REF_PRANK = $(addprefix aln/ref/prank/,$(shell ls $(NREF)/))
+REF_MAFFT = $(addprefix aln/ref/mafft/,$(shell ls $(NREF)/))
+REF_CLUSTALO = $(addprefix aln/ref/clustalo/,$(shell ls $(NREF)/))
+
+reference_coati: $(REF_COATI)
+reference_mcoati: $(REF_MCOATI)
+reference_dpmcoati: $(REF_DPMCOATI)
+reference_dna: $(REF_DNA)
+reference_ecm: $(REF_ECM)
+reference_mecm: $(REF_MECM)
+reference_prank: $(REF_PRANK)
+reference_mafft: $(REF_MAFFT)
+reference_clustalo: $(REF_CLUSTALO)
+
+aln/ref/coati/%:
+	./coati-alignpair -f $(NREF)/$* -m coati -o $@
+
+aln/ref/mcoati/%:
+	./coati-alignpair -f $(NREF)/$* -m m-coati -o $@
+
+aln/ref/dpmcoati/%:
+	./coati-alignpair -f $(NREF)/$* -m dp-mcoati -o $@
+
+aln/ref/dna/%:
+	./coati-alignpair -f $(NREF)/$* -m dna -o $@
+
+aln/ref/ecm/%:
+	./coati-alignpair -f $(NREF)/$* -m ecm -o $@
+
+aln/ref/mecm/%:
+	./coati-alignpair -f $(NREF)/$* -m m-ecm -o $@
+
+aln/ref/prank/%:
+	prank -codon -d="$(NREF)/"$* -o=$@ -quiet
+	mv $@.best.fas $@
+
+aln/ref/mafft/%:
+	mafft --quiet --preservecase --globalpair --maxiterate 1000 $(NREF)/$* > $@
+
+aln/ref/clustalo/%:
+	clustalo -i $(NREF)/$* -o $@
+
+clean_reference_%:
+	rm aln/ref/$*/*
+
+clean_reference_all:
+	rm -f aln/ref/coati/*
+	rm -f aln/ref/mcoati/*
+	rm -f aln/ref/dpmcoati/*
+	rm -f aln/ref/dna/*
+	rm -f aln/ref/ecm/*
+	rm -f aln/ref/mecm/*
+	rm -f aln/ref/prank/*
+	rm -f aln/ref/mafft/*
+	rm -f aln/ref/clustalo/*
+

@@ -1,0 +1,12 @@
+# Coati folder and executable
+coati/
+coati-alignpair
+
+# fasta files
+*.fasta
+!fasta/*.fasta
+
+#
+in_tape
+out_tape
+path

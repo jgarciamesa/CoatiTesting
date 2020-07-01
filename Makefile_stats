@@ -1,0 +1,23 @@
+
+################################################################################
+# Calculate distance between alignments                                        #
+################################################################################
+RSCRIPT = Rscript --vanilla
+
+SPECIES = gorilla
+MODEL = prank
+PATH = aln/ref/$(MODEL)
+ALN = aln/ref
+REF_LIST := $(shell ls $(PATH))
+ALN_DSEQ := $(addsuffix .dseq, $(addprefix data/, $(REF_LIST)))
+ALN_DPOS := $(addsuffix .dpos, $(addprefix data/, $(REF_LIST)))
+REF_ALIGS = data/$(SPECIES)/ref_alignments
+
+d_seq: $(ALN_DSEQ)
+	#@echo "coati,mcoati,dpmcoati,dna,ecm,mecm,prank,mafft,clustalo" > data/dseq_summary.csv
+	$(shell sed -i '1 i\filename,coati,mcoati,dpmcoati,dna,ecm,mecm,prank,mafft,clustalo' data/dseq.csv)
+	$(shell Rscript --vanilla scripts/dseq_summary.R)
+
+data/%.dseq: scripts/pa_distance.R
+	$(shell $(RSCRIPT) $< $(REF_ALIGS)/$* $(ALN)/coati/$* $(ALN)/mcoati/$* $(ALN)/dpmcoati/$* $(ALN)/dna/$* $(ALN)/ecm/$* $(ALN)/mecm/$* $(ALN)/prank/$* $(ALN)/mafft/$* $(ALN)/clustalo/$* 1 >> data/dseq.csv)
+	$(shell printf "\n" >> data/dseq.csv)
