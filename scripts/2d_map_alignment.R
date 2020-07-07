@@ -61,7 +61,7 @@ twoDmap = function(filename1, filename2) {
 		# Starting position to draw aligment
 		x = 0.7 + (j-1) * 0.1
 		y = L/2 + 0.2 + (j-1) * 0.1
-		for(i in 1:length(aln1[[1]])) {
+		for(i in 1:length(aln1[[j]])) {
 			if(aln1[[j]][i] == "-") {
 				# insertion (-->)
 				write(paste0("\\draw[->,",colors[j],", thick] (",x,",",y,") -- (",
